@@ -42,11 +42,11 @@ export default function ListPacientes() {
     const [data, setData] = React.useState([{}])
     const [actualizar, setActualizar] = React.useState(false)
     const [open, setOpen] = React.useState(false);
-    const [domicilio,setDomicilio] = React.useState({})
+    const [domicilio, setDomicilio] = React.useState({})
 
 
     React.useEffect(() => {
-        axios.get(`http://localhost:8080${endPoint[1]}`)
+        axios.get(`http://localhost:8080/paciente`)
             .then(res => setData(res.data))
             .catch(err => console.log(err))
     }, [])
@@ -59,10 +59,12 @@ console.log(data);
 
         setData(datoAEliminar)
         console.log(data)
-        axios.delete(`http://localhost:8080${endPoint[1]}/${e.target.id}`)
+        axios.delete(`http://localhost:8080/paciente/${e.target.id}`)
             .then(res => console.log(res.data))
             .catch(err => console.log(err.data))
     }
+
+
 
     const handleActualizar = (e) => {
         setActualizar(!actualizar)

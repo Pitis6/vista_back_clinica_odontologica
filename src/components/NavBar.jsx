@@ -21,7 +21,7 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function ResponsiveAppBar({ setSeleccion, seleccion }) {
   const pages = ['turnos', 'odontologos', 'pacientes'];
-  const crud = ['Listar', 'Registrar'];
+  const crud = ['listar', 'registrar'];
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -62,6 +62,7 @@ function ResponsiveAppBar({ setSeleccion, seleccion }) {
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <Typography
+              key='titulo'
               variant="h6"
               noWrap
               component="a"
@@ -79,15 +80,15 @@ function ResponsiveAppBar({ setSeleccion, seleccion }) {
               CLINICA
             </Typography>
 
-            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'flex' } }}>
+            <Box key='Links' sx={{ flexGrow: 1, display: { xs: 'flex', md: 'flex' } }}>
               {pages.map((page,index) => (
                 <React.Fragment>
                   <Button
-                    key={page}
+                    key={index}
                     onClick={(e) => handleCloseNavMenu(page, e)} //mapea botones del nav para pc 
                     sx={{ my: 2, color: 'white', display: 'block' }}
                     //---------
-                    id="basic-button"
+                    // id="basic-button"
                     aria-controls={open ? 'basic-menu' : undefined}
                     aria-haspopup="true"
                     aria-expanded={open ? 'true' : undefined}
@@ -114,13 +115,12 @@ function ResponsiveAppBar({ setSeleccion, seleccion }) {
                         </Link>
                       </MenuItem>
                     ))}
-
                   </Menu>
                 </React.Fragment>
               ))}
             </Box>
 
-            <Box sx={{ flexGrow: 0 }}>
+            {/* <Box key='usuario-contaainer' sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar alt="Remy Sharp" src="" />
@@ -129,6 +129,7 @@ function ResponsiveAppBar({ setSeleccion, seleccion }) {
               <Menu
                 sx={{ mt: '45px' }}
                 id="menu-appbar"
+                key="usuario"
                 anchorEl={anchorElUser}
                 anchorOrigin={{
                   vertical: 'top',
@@ -142,14 +143,14 @@ function ResponsiveAppBar({ setSeleccion, seleccion }) {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {/* mapea menu usuario en las dos vistas */}
+                
                 {settings.map((setting) => (
                   <MenuItem onClick={handleCloseUserMenu}>
                     <Typography key={setting} textAlign="left">{setting}</Typography>
                   </MenuItem>
                 ))}
               </Menu>
-            </Box>
+            </Box> */}
           </Toolbar>
         </Container>
       </AppBar>

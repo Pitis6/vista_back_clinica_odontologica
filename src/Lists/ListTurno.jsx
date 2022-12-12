@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import axios from 'axios';
-import { Button, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 // import { InterpreterMode } from '@mui/icons-material';
 
 
@@ -41,62 +41,109 @@ export default function ListTurnos() {
 
 
     const [data, setData] = React.useState([{}])
-    const [actualizar, setActualizar] = React.useState(false)
+    const [open, setOpen] = React.useState(false);
+    const [valor, setValor] = React.useState([])
+    const [datosActualizados, setDatosActualizados] = React.useState({})
+
+
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleClickOpen = (e) => {
+        setOpen(true);
+        const dataUpdate = data.filter(item => item.id === parseInt(e.target.id))
+        const entradas = Object.entries(dataUpdate[0])
+        setValor(entradas)
+        setDatosActualizados(dataUpdate[0]);
+        console.log(valor);
+        
+    };
+
 
     React.useEffect(() => {
-        axios.get(`http://localhost:8080${endPoint[1]}`)
+        axios.get(`http://localhost:8080/turno`)
             .then(res => setData(res.data))
             .catch(err => console.log(err))
-    }, [])
-
-   
+    }, [open])
 
     const eliminar = (e) => {
-        console.log(parseInt(e.target.id));
+        const idAEliminar = (parseInt(e.target.id));
         const datoAEliminar = data.filter(item => item.id !== parseInt(e.target.id))
-
         setData(datoAEliminar)
-        console.log(data)
-        axios.delete(`http://localhost:8080${endPoint[1]}/${e.target.id}`)
+        console.log(idAEliminar);
+        axios.delete(`http://localhost:8080/turno/${idAEliminar}`)
             .then(res => console.log(res.data))
             .catch(err => console.log(err.data))
+
     }
 
-    const handleActualizar = (e) => {
-        setActualizar(!actualizar)
-        console.log(data);
-        const dataUpdate = data.filter(item => item.id === parseInt(e.target.id))
-        console.log(dataUpdate);
+    const handleChange = (e) => {
+        setDatosActualizados({ ...datosActualizados, [e.target.name]: e.target.value })
+    }
 
+
+    const actualizar = () => {
+        axios.put(`http://localhost:8080/turno`, datosActualizados)
+            .then(res => console.log(res.data))
+            .catch(err => console.log(err.data))
+            setOpen(false)
     }
 
     return (
-        <TableContainer component={Paper} sx={{ marginTop: '20px' }}>
-            <Typography variant='h4' >Lista Turnos</Typography>
-            <Table sx={{ minWidth: 700 }} aria-label="customized table">
-                <TableHead>
-                    <TableRow>
-                        {Object.keys(data && data[0]).map(item => (
-                            <StyledTableCell key={item}  align="center">{item}</StyledTableCell>
+        <React.Fragment>
+            <TableContainer component={Paper} sx={{ marginTop: '20px' }}>
+                <Typography variant='h4' >Lista Turnos</Typography>
+                <Table sx={{ minWidth: 700 }} aria-label="customized table">
+                    <TableHead>
+                        <TableRow>
+                            {Object.keys(data && data[0]).map(item => (
+                                <StyledTableCell key={item} align="center">{item}</StyledTableCell>
+                            ))}
+                            <StyledTableCell align="center">Acciones</StyledTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {data && data.map(item => (
+                            <StyledTableRow key={item.id}>
+                                <StyledTableCell align="center">{item.id}</StyledTableCell>
+                                <StyledTableCell align="center">{item.fecha}</StyledTableCell>
+                                <StyledTableCell align="center">{item.pacienteId}</StyledTableCell>
+                                <StyledTableCell align="center">{item.odontologoId}</StyledTableCell>
+                                <StyledTableCell align="center">
+                                    <Button id={item.id} onClick={(e) => handleClickOpen(e)}>ACTUALIZAR</Button>
+                                    <Button id={item.id} onClick={(e) => eliminar(e)} >ELIMINAR</Button>
+                                </StyledTableCell>
+                            </StyledTableRow >
                         ))}
-                        <StyledTableCell align="center">Acciones</StyledTableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {data && data.map(item => (
-                        <StyledTableRow key={item.id}>
-                            <StyledTableCell align="center">{item.id}</StyledTableCell>
-                            <StyledTableCell align="center">{item.fecha}</StyledTableCell>
-                            <StyledTableCell align="center">{item.pacienteId}</StyledTableCell>
-                            <StyledTableCell align="center">{item.odontologoId}</StyledTableCell>
-                            <StyledTableCell align="center">
-                                <Button key={`actualizar${item.id}`} onClick={(e) => handleActualizar(e)}>ACTUALIZAR</Button>
-                                <Button key={item.id} onClick={(e) => eliminar(e)} >ELIMINAR</Button>
-                            </StyledTableCell>
-                        </StyledTableRow >
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            <div>
+                <Dialog open={open} onClose={handleClose}>
+                    <DialogTitle>Actualizar turno</DialogTitle>
+                    <DialogContent>
+                        {valor.map(elemento => (<TextField
+                            autoFocus
+                            margin="dense"
+                            name={`${elemento[0]}`}
+                            label={elemento[0]}
+                            type="text"
+                            fullWidth
+                            defaultValue={elemento[1]}
+                            variant="standard"
+                            onChange={(e) => handleChange(e)}
+                        />))}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>Cancel</Button>
+                        <Button onClick={actualizar}>Actualizar</Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+
+        </React.Fragment>
     );
 }

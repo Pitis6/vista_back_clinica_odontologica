@@ -57,8 +57,9 @@ export default function ListOdontologos() {
         setOpen(false);
     };
 
+
     React.useEffect(() => {
-        axios.get(`http://localhost:8080${endPoint[1]}`)
+        axios.get(`http://localhost:8080/odontologo`)
             .then(res => setData(res.data))
             .catch(err => console.log(err))
     }, [open])
@@ -67,19 +68,19 @@ export default function ListOdontologos() {
         const idAEliminar = (parseInt(e.target.id));
         const datoAEliminar = data.filter(item => item.id !== parseInt(e.target.id))
         setData(datoAEliminar)
-        axios.delete(`http://localhost:8080${endPoint[1]}/${idAEliminar}`)
+        console.log(idAEliminar);
+        axios.delete(`http://localhost:8080/odontologo/${idAEliminar}`)
             .then(res => console.log(res.data))
             .catch(err => console.log(err.data))
+        
     }
 
     const handleChange = (e) => {
-        // setActualizar(!actualizar)
-        // console.log(data);
         setDatosActualizados({ ...datosActualizados, [e.target.name]: e.target.value })
     }
 
     const actualizar = () => {
-        axios.put(`http://localhost:8080${endPoint[1]}`, datosActualizados)
+        axios.put(`http://localhost:8080/odontologo`, datosActualizados)
             .then(res => console.log(res.data))
             .catch(err => console.log(err.data))
             setOpen(false)
