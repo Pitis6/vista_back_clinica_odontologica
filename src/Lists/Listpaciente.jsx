@@ -40,23 +40,23 @@ export default function ListPacientes() {
 
 
     const [data, setData] = React.useState([{}])
-    const [actualizar, setActualizar] = React.useState(false)
     const [open, setOpen] = React.useState(false);
+    const [valor, setValor] = React.useState([])
+    const [openActualizar, setOpenActualizar] = React.useState(false);
     const [domicilio, setDomicilio] = React.useState({})
+    const [datosActualizados, setDatosActualizados] = React.useState({})
 
 
     React.useEffect(() => {
         axios.get(`http://localhost:8080/paciente`)
             .then(res => setData(res.data))
             .catch(err => console.log(err))
-    }, [])
+    }, [openActualizar])
 
-console.log(data);
 
     const eliminar = (e) => {
         console.log(parseInt(e.target.id));
         const datoAEliminar = data.filter(item => item.id !== parseInt(e.target.id))
-
         setData(datoAEliminar)
         console.log(data)
         axios.delete(`http://localhost:8080/paciente/${e.target.id}`)
@@ -64,17 +64,12 @@ console.log(data);
             .catch(err => console.log(err.data))
     }
 
-
-
-    const handleActualizar = (e) => {
-        setActualizar(!actualizar)
-        console.log(data);
-        const dataUpdate = data.filter(item => item.id === parseInt(e.target.id))
-        console.log(dataUpdate);
-    }
-
     const handleClose = () => {
         setOpen(false)
+    };
+
+    const handleCloseActualizar = () => {
+        setOpenActualizar(false);
     };
 
     const handleClickOpen = (e) => {
@@ -84,6 +79,27 @@ console.log(data);
         setDomicilio(valor)
         console.log(valor);
     };
+
+    const handleClickOpenActualizar = (e) => {
+        setOpenActualizar(true);
+        const dataUpdate = data.filter(item => item.id === parseInt(e.target.id))
+        const entradas = Object.entries(dataUpdate[0])
+        setValor(entradas)
+        setDatosActualizados(dataUpdate[0]);
+        console.log(valor);
+
+    }
+
+    const handleChange = (e) => {
+        setDatosActualizados({ ...datosActualizados, [e.target.name]: e.target.value })
+    }
+
+    const actualizar = () => {
+        axios.put(`http://localhost:8080/paciente`, datosActualizados)
+            .then(res => console.log(res.data))
+            .catch(err => console.log(err.data))
+        setOpenActualizar(false)
+    }
 
     return (
         <React.Fragment>
@@ -109,7 +125,7 @@ console.log(data);
                                 <StyledTableCell align="center">{item.email}</StyledTableCell>
                                 <StyledTableCell align="center"><Button id={item.id} onClick={(e) => handleClickOpen(e)}>Ver domicilio</Button></StyledTableCell>
                                 <StyledTableCell align="center">
-                                    <Button id={item.id} onClick={(e) => handleActualizar(e)}>ACTUALIZAR</Button>
+                                    <Button id={item.id} onClick={(e) => handleClickOpenActualizar(e)}>ACTUALIZAR</Button>
                                     <Button id={item.id} onClick={(e) => eliminar(e)} >ELIMINAR</Button>
                                 </StyledTableCell>
                             </StyledTableRow >
@@ -118,7 +134,7 @@ console.log(data);
                 </Table>
             </TableContainer>
 
-            <div>
+            <div key='domicilio'>
                 <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>Domicilio</DialogTitle>
                     <DialogContent>
@@ -126,13 +142,38 @@ console.log(data);
                         <Typography>{`Numero: ${domicilio.numero}`}</Typography>
                         <Typography>{`Provincia: ${domicilio.provincia}`}</Typography>
                         <Typography>{`Localidad: ${domicilio.localidad}`}</Typography>
-                        
+
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Aceptar</Button>
                     </DialogActions>
                 </Dialog>
             </div>
+
+            <div key='actualizar'>
+                <Dialog open={openActualizar} onClose={handleCloseActualizar}>
+                    <DialogTitle>Actualizar odontologo</DialogTitle>
+                    <DialogContent>
+                        {valor.map(elemento => (
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            name={`${elemento[0]}`}
+                            label={elemento[0]}
+                            type="text"
+                            fullWidth
+                            defaultValue={elemento[1]}
+                            variant="standard"
+                            onChange={(e) => handleChange(e)}
+                        />))}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseActualizar}>Cancel</Button>
+                        <Button onClick={actualizar}>Actualizar</Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+
         </React.Fragment>
     );
 }

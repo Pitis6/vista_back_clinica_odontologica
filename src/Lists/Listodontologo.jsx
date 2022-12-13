@@ -57,6 +57,8 @@ export default function ListOdontologos() {
         setOpen(false);
     };
 
+    
+
 
     React.useEffect(() => {
         axios.get(`http://localhost:8080/odontologo`)
